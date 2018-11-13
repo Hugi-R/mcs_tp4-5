@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import Jama.Matrix;
 import fr.enseeiht.danck.voice_analyzer.Extractor;
 import fr.enseeiht.danck.voice_analyzer.MFCC;
 import fr.enseeiht.danck.voice_analyzer.WindowMaker;
@@ -27,13 +28,20 @@ public class Dataset {
 	
 	/// Store a record as a vector 13
 	public class Record {
+		public static final int length = 13;
 		public double[] data;
 		public String path;
 		
 		public Record(double[] data, String path) {
-			assert(data.length == 13);
+			assert(data.length == length);
 			this.data = data;
 			this.path = path;
+		}
+		
+		public Matrix toMatrix(){
+			double[][] mat = new double[1][length];
+			mat[1] = data;
+			return new Matrix(mat);
 		}
 
 		@Override
@@ -83,6 +91,14 @@ public class Dataset {
 		for(int i = 0; i < files.length; ++i){
 			records.add(processFile(files[i].getAbsolutePath()));
 		}
+	}
+	
+	public Matrix toMatrix(){
+		double[][] matrix = new double[records.size()][Record.length];
+		for(int i = 0; i < records.size(); ++i){
+			matrix[i] = records.get(i).data;
+		}
+		return new Matrix(matrix);
 	}
 
 	@Override
