@@ -11,7 +11,6 @@ import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.correlation.Covariance;
 
-import Jama.Matrix;
 import fr.enseeiht.danck.voice_analyzer.Extractor;
 import fr.enseeiht.danck.voice_analyzer.MFCC;
 import fr.enseeiht.danck.voice_analyzer.WindowMaker;
