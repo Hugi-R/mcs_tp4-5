@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.math3.linear.BlockRealMatrix;
+import org.apache.commons.math3.linear.EigenDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.stat.correlation.Covariance;
+
 import Jama.Matrix;
 import fr.enseeiht.danck.voice_analyzer.Extractor;
 import fr.enseeiht.danck.voice_analyzer.MFCC;
@@ -30,6 +35,7 @@ public class Dataset {
 	public class Record {
 		public static final int length = 13;
 		public double[] data;
+		public double[] acp;
 		public String path;
 		
 		public Record(double[] data, String path) {
@@ -38,10 +44,11 @@ public class Dataset {
 			this.path = path;
 		}
 		
-		public Matrix toMatrix(){
+		public RealMatrix toMatrix(){
+			
 			double[][] mat = new double[1][length];
-			mat[1] = data;
-			return new Matrix(mat);
+			mat[0] = data;
+			return new BlockRealMatrix(mat);
 		}
 
 		@Override
@@ -91,18 +98,42 @@ public class Dataset {
 		for(int i = 0; i < files.length; ++i){
 			records.add(processFile(files[i].getAbsolutePath()));
 		}
+		
+		computeACP(3);
 	}
 	
-	public Matrix toMatrix(){
+	public RealMatrix toMatrix(){
 		double[][] matrix = new double[records.size()][Record.length];
 		for(int i = 0; i < records.size(); ++i){
 			matrix[i] = records.get(i).data;
 		}
-		return new Matrix(matrix);
+		return new BlockRealMatrix(matrix);
 	}
 
 	@Override
 	public String toString() {
 		return "Dataset [records=" + records + ", path=" + path + "]";
+	}
+	
+	private void computeACP(int dimension){
+		RealMatrix m = this.toMatrix();
+		Covariance cov = new Covariance(m);
+		//System.out.println(cov.getCovarianceMatrix());
+		
+		EigenDecomposition eig = new EigenDecomposition(cov.getCovarianceMatrix());
+		
+		double[][] w_tmp = new double[3][13];
+		for(int i = 0; i < 3; ++i){
+			System.out.println("Eigen Vector : "+eig.getEigenvector(i)+". Eigen Value : "+eig.getRealEigenvalue(i));
+			w_tmp[i] = eig.getEigenvector(i).toArray();
+		}
+		RealMatrix w = new BlockRealMatrix(w_tmp);
+		System.out.println(w);
+		
+		RealMatrix wT = w.transpose();
+		for(Record r : records){
+			RealMatrix y = r.toMatrix().multiply(wT);
+			r.acp = y.getData()[0];
+		}
 	}
 }
