@@ -2,9 +2,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.EigenDecomposition;
@@ -53,6 +57,18 @@ public class Dataset {
 		@Override
 		public String toString() {
 			return "Record [data=" + Arrays.toString(data) + ", path=" + path + "]";
+		}
+		
+		public String label(){
+			Path s = Paths.get(path);
+			String name = s.toFile().getName();
+			Pattern p = Pattern.compile("[MFH]\\d+_([a-z]+).wav.csv");
+			Matcher m = p.matcher(name);
+			if (!m.matches()) {
+				System.err.println("Regex failled");
+				System.exit(1);
+			}
+			return m.group(1);
 		}
 	}
 	
