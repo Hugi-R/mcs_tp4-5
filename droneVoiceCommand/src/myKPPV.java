@@ -28,9 +28,9 @@ public class myKPPV {
 	}
 	
 	private static double distance3D (double [] vectorT, double [] vectorA) {
-		double x=Math.pow((vectorA[0]-vectorT[0]), 2);
-		double y=Math.pow((vectorA[1]-vectorT[1]), 2);
-		double z=Math.pow((vectorA[2]-vectorT[2]), 2);
+		double x=Math.pow((abs(vectorT[0])-abs(vectorA[0])), 2);
+		double y=Math.pow((abs(vectorT[1])-abs(vectorA[1])), 2);
+		double z=Math.pow((abs(vectorT[2])-abs(vectorA[2])), 2);
 		return Math.sqrt(x+y+z);
 	}
 	
@@ -41,12 +41,13 @@ public class myKPPV {
 		 for(int i=0; i<datasetT.records.size(); i++) {
 			 List <distLabel> distList = new ArrayList <> ();
 			 double[] test=datasetT.records.get(i).acp;
+			 //System.out.println("Point:"+datasetT.records.get(i).label());
 			 for(int j=0; j<datasetA.records.size(); j++) {
 				 double[] a = datasetA.records.get(j).acp;
 				 double dist=abs(distance3D(test,a));
+				 //System.out.println(datasetA.records.get(j).label()+":"+dist);
 				 distList.add(new distLabel(dist,datasetA.records.get(j).label()));
 			 }
-			 //System.out.println("Point " + test +":");
 			 String meilleur = whatIsBest(k, distList);
 			 colorTest[i]=meilleur;
 		 }
@@ -75,21 +76,28 @@ public class myKPPV {
 	private static String whatIsBest(int k, List<distLabel> distList) {
 		Map <String,Integer> colorAp = new HashMap<>();
 		for(int n=0;n<distList.size();n++) {
-			 for(int j=n;j<distList.size()-1;j++) {
-				 if(distList.get(j).dist<distList.get(j+1).dist) {
+			 for(int j=0;j<distList.size()-n-1;j++) {
+				 if(distList.get(j).dist>distList.get(j+1).dist) {
 					 distLabel change = distList.get(j);
 					 distList.set(j, distList.get(j+1));
 					 distList.set(j+1, change);
 				 }
 			 }
 		 }
-		boolean egalite;
+		 //Affichage list
+		 for(int i=0;i<distList.size();i++) {
+			 distLabel x = distList.get(i);
+			 //System.out.println(x.dist + ": label " + x.label);
+		 }
+		 boolean egalite;
 		 String meilleur;
 		 int max;
 		 int kIntern=k;
-		do {
+		 do {
+			 //System.out.println("For k=" + kIntern);
 			 for(int j=0;j<kIntern;j++) {
 				 distLabel var=distList.get(j);
+				 //System.out.println(var.dist + ": label " + var.label);
 				 if(!colorAp.containsKey(var.label)) {
 					 colorAp.put(var.label, 1);
 				 }else {
@@ -111,22 +119,23 @@ public class myKPPV {
 				 }
 			 }
 			 if(egalite) {
-				 kIntern++;
+				 kIntern--;
 				 colorAp.clear();
 			 }
-		}while (egalite && kIntern<distList.size());
+		}while (egalite && kIntern>0);
+		System.out.println("meilleur=" + meilleur);
 		return meilleur;
 	}
 
-	public static void main(String[] args) {
-		double[] testA= {9,8,11,6,16,2,1,5,18};
+	/*public static void main(String[] args) {
+		double[] testA= {9.9,8,11,6,16,2,1,5,18};
 		String[] labelA= {"a","b","c","b","c","b","a","a","c"};
 		double[] testT= {10,3,12};
 		String[] labelT= kppvDouble(testA, labelA, testT, 3);
 		for(int i=0 ; i<labelT.length; i++) {
 			System.out.println("The number " + testT[i] + " is recognised as the label " + labelT[i]);
 		}
-	}
+	}*/
 	
 	
 }
