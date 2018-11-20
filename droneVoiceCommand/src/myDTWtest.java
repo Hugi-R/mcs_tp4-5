@@ -29,7 +29,7 @@ public class myDTWtest {
 	static int FieldLength(String filePath) throws IOException {
 		int counter = 0;
 		File file = new File(filePath);
-		for (String line : Files.readAllLines(file.toPath(), Charset.defaultCharset())) {
+		for (@SuppressWarnings("unused") String line : Files.readAllLines(file.toPath(), Charset.defaultCharset())) {
 			counter++;
 		}
 		return 2 * Math.floorDiv(counter, 512);

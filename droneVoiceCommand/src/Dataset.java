@@ -22,13 +22,15 @@ import fr.enseeiht.danck.voice_analyzer.WindowMaker;
 public class Dataset {
 	public ArrayList<Record> records = new ArrayList<>();
 	public String path;
+	public boolean isAcp;
+	private RealMatrix base;
 
 	// Fonction permettant de calculer la taille des Fields
 	// c'est-à-dire le nombre de MFCC du Field
 	private static int FieldLength(String filePath) throws IOException {
 		int counter = 0;
 		File file = new File(filePath);
-		for (String _ : Files.readAllLines(file.toPath(), Charset.defaultCharset())) {
+		for (@SuppressWarnings("unused") String s : Files.readAllLines(file.toPath(), Charset.defaultCharset())) {
 			counter++;
 		}
 		return 2 * Math.floorDiv(counter, 512);
@@ -106,15 +108,19 @@ public class Dataset {
 		return new Record(data, path);
 	}
 	
-	public Dataset(String folderPath){
+	public Dataset(String folderPath, boolean doAcp){
 		path = folderPath;
+		isAcp = doAcp;
 		
 		File[] files = new File(folderPath).listFiles();
 		for(int i = 0; i < files.length; ++i){
 			records.add(processFile(files[i].getAbsolutePath()));
 		}
-		
-		computeACP(3);
+		if(isAcp)
+			computeACP(3);
+	}
+	public Dataset(String folderPath){
+		this(folderPath, false);
 	}
 	
 	public RealMatrix toMatrix(){
@@ -130,24 +136,25 @@ public class Dataset {
 		return "Dataset [records=" + records + ", path=" + path + "]";
 	}
 	
+	public double[] toDatasetBase(RealMatrix m){
+		return m.multiply(base).getRow(0);
+	}
+	
 	private void computeACP(int dimension){
 		RealMatrix m = this.toMatrix();
 		Covariance cov = new Covariance(m);
-		//System.out.println(cov.getCovarianceMatrix());
 		
 		EigenDecomposition eig = new EigenDecomposition(cov.getCovarianceMatrix());
 		
 		double[][] w_tmp = new double[3][13];
 		for(int i = 0; i < 3; ++i){
-			System.out.println("Eigen Vector : "+eig.getEigenvector(i)+". Eigen Value : "+eig.getRealEigenvalue(i));
 			w_tmp[i] = eig.getEigenvector(i).toArray();
 		}
 		RealMatrix w = new BlockRealMatrix(w_tmp);
-		System.out.println(w);
 		
-		RealMatrix wT = w.transpose();
+		base = w.transpose();
 		for(Record r : records){
-			RealMatrix y = r.toMatrix().multiply(wT);
+			RealMatrix y = r.toMatrix().multiply(base);
 			r.acp = y.getData()[0];
 		}
 	}
