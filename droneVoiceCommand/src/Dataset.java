@@ -20,14 +20,14 @@ import fr.enseeiht.danck.voice_analyzer.MFCC;
 import fr.enseeiht.danck.voice_analyzer.WindowMaker;
 
 public class Dataset {
-	public ArrayList<Record> records = new ArrayList<>();
+	public List<Record> records = new ArrayList<>();
 	public String path;
 	public boolean isAcp;
 	private RealMatrix base;
 
 	// Fonction permettant de calculer la taille des Fields
 	// c'est-à-dire le nombre de MFCC du Field
-	private static int FieldLength(String filePath) throws IOException {
+	private static int fieldLength(String filePath) throws IOException {
 		int counter = 0;
 		File file = new File(filePath);
 		for (@SuppressWarnings("unused") String s : Files.readAllLines(file.toPath(), Charset.defaultCharset())) {
@@ -40,7 +40,7 @@ public class Dataset {
 	public class Record {
 		public static final int length = 13;
 		public double[] data;
-		public double[] acp;
+		public double[] acp = null;
 		public String path;
 		
 		public Record(double[] data, String path) {
@@ -85,7 +85,7 @@ public class Dataset {
 			WindowMaker windowMaker = new MultipleFileWindowMaker(files);
 	
 			// Get MFCC from file
-			mfccs = new MFCC[FieldLength(path)];
+			mfccs = new MFCC[fieldLength(path)];
 			for (int i = 0; i < mfccs.length; i++) {
 				mfccs[i] = extractor.nextMFCC(windowMaker);
 			}
@@ -137,10 +137,12 @@ public class Dataset {
 	}
 	
 	public double[] toDatasetBase(RealMatrix m){
+		assert isAcp : "This dataset did not compute ACP !";
 		return m.multiply(base).getRow(0);
 	}
 	
 	private void computeACP(int dimension){
+		assert isAcp : "Trying to compute ACP on a dataset that shoudn't !";
 		RealMatrix m = this.toMatrix();
 		Covariance cov = new Covariance(m);
 		

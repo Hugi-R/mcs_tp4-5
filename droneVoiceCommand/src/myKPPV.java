@@ -38,6 +38,8 @@ public class myKPPV {
 	}
 
 	public String[] kppv(Dataset datasetA, Dataset datasetT, int k) {
+		assert k > 0 : "k must be positive";
+		assert datasetA.isAcp : "Dataset without ACP ("+datasetA.path+") cannot be used as a reference !";
 		String[] colorTest = new String[datasetT.records.size()];
 		for (int i = 0; i < datasetT.records.size(); i++) {
 			List<distLabel> distList = new ArrayList<>();
