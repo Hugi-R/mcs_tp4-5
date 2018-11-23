@@ -12,6 +12,11 @@ import java.util.HashMap;
 
 public class ResultsActivity extends AppCompatActivity {
 
+    public static int SIZE_TEXT_EXTRA_LARGE = 26;
+    public static int SIZE_TEXT_LARGE = 22;
+    public static int SIZE_TEXT_MEDIUM = 18;
+    public static int SIZE_TEXT_SMALL = 14;
+
     private enum Type {DTW, KppV};
     private String DTW = "DTW";
     private Float DTWrate;
@@ -31,6 +36,13 @@ public class ResultsActivity extends AppCompatActivity {
     private Float rateDTW;
     private HashMap<String, HashMap<String, Integer>> confusionMatrixKppV = new HashMap<>();
     private Float rateKppV;
+
+    private void initFormatComponents(){
+        labelWinner.setTextSize(SIZE_TEXT_LARGE);
+        labelLooser.setTextSize(SIZE_TEXT_MEDIUM);
+        tauxWinner.setTextSize(SIZE_TEXT_EXTRA_LARGE);
+        tauxLooser.setTextSize(SIZE_TEXT_LARGE);
+    }
 
     public void showWinnerDetail(View view){
         ActivityOptionsCompat options = ActivityOptionsCompat.
@@ -85,12 +97,14 @@ public class ResultsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_results);
 
         labelWinner = findViewById(R.id.labelWinner);
-        //labelWinner.setTextSize();
         tauxWinner = findViewById(R.id.tauxWinner);
         labelLooser = findViewById(R.id.labelLooser);
         tauxLooser = findViewById(R.id.tauxLooser);
 
+        initFormatComponents();
+
         //TODO: appeler les fonctions de calcul et init les taux et matrices
+
 
         rateDTW = (float) 5;
         confusionMatrixDTW.put("cmd1", new HashMap<String, Integer>());
@@ -110,7 +124,7 @@ public class ResultsActivity extends AppCompatActivity {
 
 
         //comparer taux et definir le winner
-        if (rateDTW > rateKppV)
+        if (DTWrate > KppVrate)
             winner = Type.DTW;
         else
             winner = Type.KppV;
@@ -119,15 +133,15 @@ public class ResultsActivity extends AppCompatActivity {
         switch (winner){
             case DTW:
                 labelWinner.setText(DTW);
-                tauxWinner.setText(String.valueOf(DTWrate));
+                tauxWinner.setText(String.valueOf(DTWrate)+"%");
                 labelLooser.setText(KppV);
-                tauxLooser.setText(String.valueOf(KppVrate));
+                tauxLooser.setText(String.valueOf(KppVrate)+"%");
                 break;
             case KppV:
                 labelWinner.setText(KppV);
-                tauxWinner.setText(String.valueOf(KppVrate));
+                tauxWinner.setText(String.valueOf(KppVrate)+"%");
                 labelLooser.setText(DTW);
-                tauxLooser.setText(String.valueOf(DTWrate));
+                tauxLooser.setText(String.valueOf(DTWrate)+"%");
                 break;
         }
     }

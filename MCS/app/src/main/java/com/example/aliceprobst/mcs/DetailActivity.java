@@ -16,6 +16,8 @@ public class DetailActivity extends AppCompatActivity {
         TextView matrix = findViewById(R.id.matrix);
         TextView rate = findViewById(R.id.rate);
 
+        name.setTextSize(ResultsActivity.SIZE_TEXT_LARGE);
+
         Bundle extras = getIntent().getExtras();
         name.setText(extras.getString("name"));
         matrix.setText(extras.getString("matrix"));
