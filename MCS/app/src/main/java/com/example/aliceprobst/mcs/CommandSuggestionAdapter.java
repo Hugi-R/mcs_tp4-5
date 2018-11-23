@@ -11,6 +11,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CommandSuggestionAdapter extends BaseAdapter implements Filterable {
@@ -32,10 +33,10 @@ public class CommandSuggestionAdapter extends BaseAdapter implements Filterable 
     // our listener
     private OnAddCommandClickListener onAddCommandClickListener;
 
-    public CommandSuggestionAdapter(Context context, int resource, List<String> commands, String addNewCommandText) {
+    public CommandSuggestionAdapter(Context context, int resource, String [] commands, String addNewCommandText) {
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResource = mDropDownResource = resource;
-        this.commands = commands;
+        this.commands = Arrays.asList(commands);
         this.addNewCommandText = addNewCommandText;
     }
 
@@ -126,8 +127,8 @@ public class CommandSuggestionAdapter extends BaseAdapter implements Filterable 
         return arrayFilter;
     }
 
-    public void setData(ArrayList<String> new_commands) {
-        this.originalValues = new_commands;
+    public void setData(String [] new_commands) {
+        this.originalValues = new ArrayList<>(Arrays.asList(new_commands));
     }
 
     /**

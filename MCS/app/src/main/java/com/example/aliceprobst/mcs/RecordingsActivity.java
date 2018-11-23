@@ -19,16 +19,19 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RecordingsActivity extends AppCompatActivity implements RecordingsRecyclerViewListener {
 
-
     // DOUBLON WAVRecorder
-    private static final String AUDIO_RECORDER_FOLDER = "records";
+    public static final String AUDIO_RECORDER_FOLDER = "recordsWAV";
+    public static final String CSV_FOLDER = "recordsCSV";
 
     private RecyclerView recordingsRecyclerView;
-    private RecyclerView.Adapter recordingsAdapter;
+    private RecordingAdapter recordingsAdapter;
     private CommandSuggestionAdapter commandsAdapter;
     //private RecyclerView.LayoutManager recordingsLayoutManager;
 
@@ -36,7 +39,7 @@ public class RecordingsActivity extends AppCompatActivity implements RecordingsR
     private ArrayList<Recording> recordingsAsRef = new ArrayList<>();
     private ArrayList<Recording> recordingsAsTest = new ArrayList<>();
 
-    ArrayList<String> commands;
+    HashMap<String, Integer> commands;
 
     private Button play, stop, record;
     private WAVRecorder wavRecorder;
@@ -72,6 +75,8 @@ public class RecordingsActivity extends AppCompatActivity implements RecordingsR
                 // EXAMPLES A CHANGER
                 record.setVisibility(View.GONE);
                 stop.setVisibility(View.VISIBLE);
+
+                recordingsAdapter.setClickable(false);
             }
         });
 
@@ -143,44 +148,35 @@ public class RecordingsActivity extends AppCompatActivity implements RecordingsR
          * Setting up title autocomplete
          */
 
-        commands = new ArrayList<>(Arrays.asList("Avance", "Recule", "Droite", "Gauche", "EtatUrgence", "TourneDroite", "TourneGauche", "FaisUnFlip", "ArreteToi"));
-        // the footer item's text
+        commands = new HashMap<>();
+        commands.put("Avance", 0);
+        commands.put("Droite", 0);
+        commands.put("Gauche", 0);
+        commands.put("EtatUrgence", 0);
+        commands.put("TourneDroite", 0);
+        commands.put("TourneGauche", 0);
+        commands.put("FaisUnFlip", 0);
+        commands.put("ArreteToi", 0);
+        // the add item's text
         String addNewCommandSuggestion = "+ Add new command";
 
 
         // our custom adapter with the custom footer text as last parameter
         commandsAdapter = new CommandSuggestionAdapter(
-                this, android.R.layout.simple_dropdown_item_1line, commands, addNewCommandSuggestion);
+                this, android.R.layout.simple_dropdown_item_1line, commands.keySet().toArray(new String[0]), addNewCommandSuggestion);
 
         // bind to our custom click listener interface
         commandsAdapter.setOnAddCommandClickListener(new OnAddCommandClickListener() {
             @Override
             public void onAddCommandClicked(View view) {
 
-                Log.d("Count", "c : " + commandsAdapter.getCount());
-                commands.add(record_title.getText().toString());
-                commandsAdapter.setData(commands);
-                Log.d("Count", "c : " + commandsAdapter.getCount());
+                String new_command_name = record_title.getText().toString();
+
+                commands.put(new_command_name, 0);
+                commandsAdapter.setData(commands.keySet().toArray(new String[0]));
                 commandsAdapter.notifyDataSetChanged();
 
-                Log.d("NEW COMMAND", "Saved new " + record_title.getText().toString());
-                wavRecorder.saveTo(record_title.getText().toString() + ".wav");
-                fetchRecordings();
-                recordingsAdapter.notifyDataSetChanged();
-                record_title.setVisibility(View.GONE);
-                play.setVisibility(View.VISIBLE);
-                //recordingsRecyclerView.smoothScrollToPosition(recordingsAdapter.getItemCount() - 1);
-                recordingsRecyclerView.postDelayed(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if(recordingsRecyclerView.findViewHolderForAdapterPosition(recordingsAdapter.getItemCount() - 1) != null )
-                        {
-                            recordingsRecyclerView.findViewHolderForAdapterPosition(recordingsAdapter.getItemCount() - 1).itemView.performClick();
-                        }
-                    }
-                },50);
+                performCommandNameSelected(new_command_name);
 
             }
         });
@@ -192,28 +188,38 @@ public class RecordingsActivity extends AppCompatActivity implements RecordingsR
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                    Log.d("NEW COMMAND", "Saved new " + ((TextView) view).getText());
-                    wavRecorder.saveTo(((TextView) view).getText().toString() + ".wav");
-                    fetchRecordings();
-                    recordingsAdapter.notifyDataSetChanged();
-                    record_title.setVisibility(View.GONE);
-                    play.setVisibility(View.VISIBLE);
-                    //recordingsRecyclerView.smoothScrollToPosition(recordingsAdapter.getItemCount() - 1);
-                    recordingsRecyclerView.postDelayed(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            if(recordingsRecyclerView.findViewHolderForAdapterPosition(recordingsAdapter.getItemCount() - 1) != null )
-                            {
-                                recordingsRecyclerView.findViewHolderForAdapterPosition(recordingsAdapter.getItemCount() - 1).itemView.performClick();
-                            }
-                        }
-                    },50);
+                performCommandNameSelected(((TextView) view).getText().toString());
+
             }
 
         });
 
+    }
+
+    private void performCommandNameSelected(String commandName) {
+
+        Log.d("NEW COMMAND", "Saved new " + commandName);
+        wavRecorder.saveTo(commandName + commands.get(commandName) + ".wav");
+        commands.replace(commandName, commands.get(commandName).intValue() + 1);
+        fetchRecordings();
+        recordingsAdapter.notifyDataSetChanged();
+        record_title.setVisibility(View.GONE);
+        play.setVisibility(View.VISIBLE);
+        recordingsRecyclerView.smoothScrollToPosition(recordingsAdapter.getItemCount() - 1);
+        recordingsRecyclerView.setEnabled(true);
+        recordingsRecyclerView.postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if(recordingsRecyclerView.findViewHolderForAdapterPosition(recordingsAdapter.getItemCount() - 1) != null )
+                {
+                    recordingsRecyclerView.findViewHolderForAdapterPosition(recordingsAdapter.getItemCount() - 1).itemView.performClick();
+                }
+            }
+        },50);
+
+        recordingsAdapter.setClickable(true);
     }
 
     private void fetchRecordings() {
@@ -283,8 +289,10 @@ public class RecordingsActivity extends AppCompatActivity implements RecordingsR
     @Override
     public void recyclerViewListClicked(View v, int position) {
 
-        selectedCommandFilePath = recordingsArraylist.get(position).getURI();
-        play.setVisibility(View.VISIBLE);
+        if(recordingsAdapter.isClickable()) {
+            selectedCommandFilePath = recordingsArraylist.get(position).getURI();
+            play.setVisibility(View.VISIBLE);
+        }
     }
 
 }

@@ -18,11 +18,9 @@ import java.io.IOException;
 
 public class WAVRecorder {
 
-
-
-
     private static final int RECORDER_BPP = 16;
-    private static final String AUDIO_RECORDER_FOLDER = "records";
+    private static final String AUDIO_RECORDER_FOLDER = RecordingsActivity.AUDIO_RECORDER_FOLDER;
+    private static final String CSV_FOLDER = RecordingsActivity.CSV_FOLDER;
     private static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
     private static final int RECORDER_SAMPLERATE = 16000;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;

@@ -22,6 +22,8 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
 
     private int selectedItem = RecyclerView.NO_POSITION;
 
+    private boolean isClickable;
+
     public RecordingAdapter(Context context, RecordingsRecyclerViewListener itemListener, ArrayList<Recording> recordingArrayList){
         this.context = context;
         this.itemListener = itemListener;
@@ -49,6 +51,14 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
     @Override
     public int getItemCount() {
         return recordingArrayList.size();
+    }
+
+    public boolean isClickable() {
+        return isClickable;
+    }
+
+    public void setClickable(boolean clickable) {
+        isClickable = clickable;
     }
 
 
@@ -101,14 +111,16 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
             // in that case, getAdapterPosition() will return RecyclerView.NO_POSITION
             if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
 
-            Log.d("CLICKED", v.toString());
+            if(isClickable) {
+                Log.d("CLICKED", v.toString());
 
-            // Updating old as well as new positions
-            notifyItemChanged(selectedItem);
-            selectedItem = getAdapterPosition();
-            notifyItemChanged(selectedItem);
+                // Updating old as well as new positions
+                notifyItemChanged(selectedItem);
+                selectedItem = getAdapterPosition();
+                notifyItemChanged(selectedItem);
 
-            itemListener.recyclerViewListClicked(v, this.getLayoutPosition());
+                itemListener.recyclerViewListClicked(v, this.getLayoutPosition());
+            }
 
         }
 
