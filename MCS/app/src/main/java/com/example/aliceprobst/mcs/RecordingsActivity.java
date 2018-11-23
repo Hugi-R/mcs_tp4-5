@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RecordingsActivity extends AppCompatActivity implements RecordingsRecyclerViewListener {
@@ -28,12 +29,14 @@ public class RecordingsActivity extends AppCompatActivity implements RecordingsR
 
     private RecyclerView recordingsRecyclerView;
     private RecyclerView.Adapter recordingsAdapter;
-    private RecyclerView.Adapter commandsAdapter;
+    private CommandSuggestionAdapter commandsAdapter;
     //private RecyclerView.LayoutManager recordingsLayoutManager;
 
     private ArrayList<Recording> recordingsArraylist = new ArrayList<>();
     private ArrayList<Recording> recordingsAsRef = new ArrayList<>();
     private ArrayList<Recording> recordingsAsTest = new ArrayList<>();
+
+    ArrayList<String> commands;
 
     private Button play, stop, record;
     private WAVRecorder wavRecorder;
@@ -140,31 +143,55 @@ public class RecordingsActivity extends AppCompatActivity implements RecordingsR
          * Setting up title autocomplete
          */
 
-        String [] commands = {"Avance", "Recule", "Droite", "Gauche", "EtatUrgence", "TourneDroite", "TourneGauche", "FaisUnFlip", "ArreteToi"};
+        commands = new ArrayList<>(Arrays.asList("Avance", "Recule", "Droite", "Gauche", "EtatUrgence", "TourneDroite", "TourneGauche", "FaisUnFlip", "ArreteToi"));
         // the footer item's text
         String addNewCommandSuggestion = "+ Add new command";
 
 
         // our custom adapter with the custom footer text as last parameter
-        CommandSuggestionAdapter adapter = new CommandSuggestionAdapter(
+        commandsAdapter = new CommandSuggestionAdapter(
                 this, android.R.layout.simple_dropdown_item_1line, commands, addNewCommandSuggestion);
 
         // bind to our custom click listener interface
-        adapter.setOnAddCommandClickListener(new CommandSuggestionAdapter.OnAddCommandClickListener() {
+        commandsAdapter.setOnAddCommandClickListener(new OnAddCommandClickListener() {
             @Override
-            public void onAddCommandClicked() {
+            public void onAddCommandClicked(View view) {
+
+                Log.d("Count", "c : " + commandsAdapter.getCount());
+                commands.add(record_title.getText().toString());
+                commandsAdapter.setData(commands);
+                Log.d("Count", "c : " + commandsAdapter.getCount());
+                commandsAdapter.notifyDataSetChanged();
+
+                Log.d("NEW COMMAND", "Saved new " + record_title.getText().toString());
+                wavRecorder.saveTo(record_title.getText().toString() + ".wav");
+                fetchRecordings();
+                recordingsAdapter.notifyDataSetChanged();
+                record_title.setVisibility(View.GONE);
+                play.setVisibility(View.VISIBLE);
+                //recordingsRecyclerView.smoothScrollToPosition(recordingsAdapter.getItemCount() - 1);
+                recordingsRecyclerView.postDelayed(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if(recordingsRecyclerView.findViewHolderForAdapterPosition(recordingsAdapter.getItemCount() - 1) != null )
+                        {
+                            recordingsRecyclerView.findViewHolderForAdapterPosition(recordingsAdapter.getItemCount() - 1).itemView.performClick();
+                        }
+                    }
+                },50);
 
             }
         });
 
-        record_title.setAdapter(adapter);
-
+        record_title.setThreshold(0);
+        record_title.setAdapter(commandsAdapter);
         record_title.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.d("NEW COMMAND", "Saved new " + ((TextView) view).getText());
-                if(i != 0) {
+
                     Log.d("NEW COMMAND", "Saved new " + ((TextView) view).getText());
                     wavRecorder.saveTo(((TextView) view).getText().toString() + ".wav");
                     fetchRecordings();
@@ -183,11 +210,6 @@ public class RecordingsActivity extends AppCompatActivity implements RecordingsR
                             }
                         }
                     },50);
-                    //Log.d("NEW ITEM", "Saved new " + recordingsRecyclerView.findViewHolderForAdapterPosition(0).itemView.toString());
-                    //recordingsRecyclerView.findViewHolderForAdapterPosition(recordingsAdapter.getItemCount() - 1).itemView.performClick();
-                } else {
-
-                }
             }
 
         });

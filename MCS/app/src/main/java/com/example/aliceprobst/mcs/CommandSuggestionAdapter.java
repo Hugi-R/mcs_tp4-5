@@ -11,37 +11,32 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CommandSuggestionAdapter extends BaseAdapter implements Filterable {
 
-    public interface OnAddCommandClickListener {
-        public void onAddCommandClicked();
-    }
-
-    private List<String> mObjects;
+    private List<String> commands;
     private final Object mLock = new Object();
 
     private int mResource;
     private int mDropDownResource;
 
-    private ArrayList<String> mOriginalValues;
-    private ArrayFilter mFilter;
+    private ArrayList<String> originalValues;
+    private ArrayFilter arrayFilter;
 
-    private LayoutInflater mInflater;
+    private LayoutInflater layoutInflater;
 
     // the last item, i.e the footer
-    private String mFooterText;
+    private String addNewCommandText;
 
     // our listener
-    private OnAddCommandClickListener mListener;
+    private OnAddCommandClickListener onAddCommandClickListener;
 
-    public CommandSuggestionAdapter(Context context, int resource, String[] objects, String footerText) {
-        mInflater   = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mResource   = mDropDownResource = resource;
-        mObjects    = Arrays.asList(objects);
-        mFooterText = footerText;
+    public CommandSuggestionAdapter(Context context, int resource, List<String> commands, String addNewCommandText) {
+        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mResource = mDropDownResource = resource;
+        this.commands = commands;
+        this.addNewCommandText = addNewCommandText;
     }
 
 
@@ -49,23 +44,23 @@ public class CommandSuggestionAdapter extends BaseAdapter implements Filterable 
      * Set listener for clicks on the footer item
      */
     public void setOnAddCommandClickListener(OnAddCommandClickListener listener) {
-        mListener = listener;
+        onAddCommandClickListener = listener;
     }
 
     @Override
     public int getCount() {
-        return mObjects.size()+1;
+        return commands.size() + 1;
     }
 
     @Override
     public String getItem(int position) {
-        if(position == (getCount()-1)) {
+        if(position == 0) {
             // last item is always the footer text
-            return mFooterText;
+            return addNewCommandText;
         }
 
         // return real text
-        return mObjects.get(position);
+        return commands.get(position - 1);
     }
 
     @Override
@@ -84,7 +79,7 @@ public class CommandSuggestionAdapter extends BaseAdapter implements Filterable 
         TextView text;
 
         if (convertView == null) {
-            view = mInflater.inflate(resource, parent, false);
+            view = layoutInflater.inflate(resource, parent, false);
         } else {
             view = convertView;
         }
@@ -99,13 +94,13 @@ public class CommandSuggestionAdapter extends BaseAdapter implements Filterable 
 
         text.setText(getItem(position));
 
-        if(position == (getCount()-1)) {
+        if(position == 0) {
             // it's the last item, bind click listener
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mListener != null) {
-                        mListener.onAddCommandClicked();
+                    if(onAddCommandClickListener != null) {
+                        onAddCommandClickListener.onAddCommandClicked(v);
                     }
                 }
             });
@@ -125,10 +120,14 @@ public class CommandSuggestionAdapter extends BaseAdapter implements Filterable 
 
     @Override
     public Filter getFilter() {
-        if (mFilter == null) {
-            mFilter = new ArrayFilter();
+        if (arrayFilter == null) {
+            arrayFilter = new ArrayFilter();
         }
-        return mFilter;
+        return arrayFilter;
+    }
+
+    public void setData(ArrayList<String> new_commands) {
+        this.originalValues = new_commands;
     }
 
     /**
@@ -141,16 +140,16 @@ public class CommandSuggestionAdapter extends BaseAdapter implements Filterable 
         protected FilterResults performFiltering(CharSequence prefix) {
             FilterResults results = new FilterResults();
 
-            if (mOriginalValues == null) {
+            if (originalValues == null) {
                 synchronized (mLock) {
-                    mOriginalValues = new ArrayList<String>(mObjects);
+                    originalValues = new ArrayList<String>(commands);
                 }
             }
 
             if (prefix == null || prefix.length() == 0) {
                 ArrayList<String> list;
                 synchronized (mLock) {
-                    list = new ArrayList<String>(mOriginalValues);
+                    list = new ArrayList<String>(originalValues);
                 }
                 results.values = list;
 
@@ -161,7 +160,7 @@ public class CommandSuggestionAdapter extends BaseAdapter implements Filterable 
 
                 ArrayList<String> values;
                 synchronized (mLock) {
-                    values = new ArrayList<String>(mOriginalValues);
+                    values = new ArrayList<String>(originalValues);
                 }
 
                 final int count = values.size();
@@ -190,7 +189,7 @@ public class CommandSuggestionAdapter extends BaseAdapter implements Filterable 
 
                 results.values = newValues;
                 // add one since we always show the footer
-                results.count = newValues.size()+1;
+                results.count = newValues.size() + 1;
             }
 
             return results;
@@ -199,7 +198,7 @@ public class CommandSuggestionAdapter extends BaseAdapter implements Filterable 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             //noinspection unchecked
-            mObjects = (List<String>) results.values;
+            commands = (List<String>) results.values;
             notifyDataSetChanged();
         }
     }

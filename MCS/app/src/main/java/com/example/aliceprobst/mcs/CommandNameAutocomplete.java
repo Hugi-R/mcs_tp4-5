@@ -15,7 +15,7 @@ public class CommandNameAutocomplete extends AppCompatAutoCompleteTextView {
     public CommandNameAutocomplete(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-
+/*
     @Override
     protected void performFiltering (CharSequence text, int keyCode) {
 
@@ -25,6 +25,7 @@ public class CommandNameAutocomplete extends AppCompatAutoCompleteTextView {
     protected void replaceText (CharSequence text) {
 
     }
+    */
 
     @Override
     public boolean enoughToFilter() {
