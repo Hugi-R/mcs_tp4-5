@@ -1,3 +1,4 @@
 # mcs_tp4-5
 
-droneVoiceCommand can be imported as an Eclipse project
+Le dossier MCS contient l'application Android d'enregistrement de fichiers WAV
+Le dossier droneVoiceCommand contient les algorithmes de reconnaissance vocale et la comparaison de ces algorithmes
