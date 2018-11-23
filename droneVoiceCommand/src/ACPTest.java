@@ -16,9 +16,9 @@ public class ACPTest {
 		return tab;
 	}
 	
-	private static void confusionMatrix (Dataset exp, String[] colorLabel) {
+	public static Map<String, Map<String, Integer>> confusionMatrix (Dataset ref, Dataset exp, String[] colorLabel) {
 		Map<String, Map<String, Integer>> confusion = new HashMap<>();
-		List<String> labelTab = constrLabel(exp);
+		List<String> labelTab = constrLabel(ref);
 		creationMatrix(confusion, labelTab);
 		for(int i=0;i<exp.records.size();i++) {
 			String e = exp.records.get(i).label();
@@ -27,7 +27,7 @@ public class ACPTest {
 			temp++;
 			confusion.get(e).put(c, temp);
 		}
-		myDTWtest.printConfusion(confusion);
+		return confusion;
 	}
 
 	private static void creationMatrix(Map<String, Map<String, Integer>> confusion, List<String> labelTab) {
@@ -51,7 +51,7 @@ public class ACPTest {
 		for(int i=0; i<colorLabel.length; i++) {
 			System.out.println(datasetExp.records.get(i).path + " have the label : " + colorLabel[i]);
 		}
-		confusionMatrix(datasetExp,colorLabel);
+		confusionMatrix(datasetRef,datasetExp,colorLabel);
 		
 		System.out.println("Without ACP");
 		myKPPV kppvNoAcp = new myKPPV(false,false);

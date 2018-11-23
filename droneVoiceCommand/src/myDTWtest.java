@@ -103,7 +103,7 @@ public class myDTWtest {
 		return m.group(1);
 	}
 
-	public static void printConfusion(Map<String, Map<String, Integer>> confusion) {
+	public static double printConfusion(Map<String, Map<String, Integer>> confusion) {
 		int good = 0;
 		int bad = 0;
 		String s = "hyp\\ref, ";
@@ -126,6 +126,7 @@ public class myDTWtest {
 		float failure = (float)bad/(float)(good+bad);
 		System.out.println(s);
 		System.out.println("Taux d'echec :"+failure);
+		return failure;
 	}
 
 	public float distanceCsv(String a, String b) throws IOException, InterruptedException {
