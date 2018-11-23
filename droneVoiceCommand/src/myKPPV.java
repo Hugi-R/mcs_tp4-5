@@ -10,13 +10,16 @@ import java.util.Map;
  */
 public class myKPPV {
 	private boolean useAcp;
+	private boolean kAug;
 
-	public myKPPV(boolean useAcp) {
+	public myKPPV(boolean useAcp, boolean kAug) {
 		this.useAcp = useAcp;
+		this.kAug = kAug;
 	}
 
 	public myKPPV() {
 		this.useAcp = true;
+		this.kAug = false;
 	}
 
 	static class distLabel {
@@ -93,10 +96,13 @@ public class myKPPV {
 				}
 			}
 			if (egalite) {
-				kIntern--;
+				if(!kAug)
+					kIntern--;
+				else
+					kIntern++;
 				colorAp.clear();
 			}
-		} while (egalite && kIntern > 0);
+		} while (egalite && ((kIntern > 0 && !kAug)|| (kIntern<distList.size() && kAug)) );
 		return meilleur;
 	}
 }
