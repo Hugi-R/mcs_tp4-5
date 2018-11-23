@@ -1,4 +1,16 @@
 <resources>
+    <string-array name="commands">
+        <item>Choose command...</item>
+        <item>Avance</item>
+        <item>Recule</item>
+        <item>Droite</item>
+        <item>Gauche</item>
+        <item>EtatUrgence</item>
+        <item>TourneDroite</item>
+        <item>TourneGauche</item>
+        <item>FaisUnFlip</item>
+        <item>ArreteToi</item>
+    </string-array>
     <string name="app_name">MCS</string>
     <string name="launch_test_button_text">Launch\ntest</string>
     <string name="title_activity_recordings">RecordingsActivity</string>

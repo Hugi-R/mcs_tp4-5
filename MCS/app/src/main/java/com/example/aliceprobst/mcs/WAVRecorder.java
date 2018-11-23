@@ -47,7 +47,7 @@ public class WAVRecorder {
     }
 
 
-    private String getTempFilename() {
+    private String getTempFilename(boolean erase) {
 
         File folder = new File(Environment.getExternalStorageDirectory() +
                 File.separator + AUDIO_RECORDER_FOLDER);
@@ -64,12 +64,43 @@ public class WAVRecorder {
             File tempFile = new File(folder.getAbsolutePath() +
                     File.separator + AUDIO_RECORDER_TEMP_FILE);
 
+            if(erase)
             if (tempFile.exists())
                 tempFile.delete();
 
             Log.d("File recording", "Created new file : " + tempFile.getAbsolutePath());
 
             return (folder.getAbsolutePath() + "/" + AUDIO_RECORDER_TEMP_FILE);
+
+        } else {
+            Log.d("File recording", "Failed to create new folder");
+            return null;
+        }
+    }
+
+    private String getFileName(String name, boolean erase) {
+        File folder = new File(Environment.getExternalStorageDirectory() +
+                File.separator + AUDIO_RECORDER_FOLDER);
+
+        boolean success = true;
+        if (!folder.exists()) {
+            Log.d("File recording", "Trying to create new folder : " + folder.getAbsolutePath());
+            success = folder.mkdir();
+        }
+
+        if(success) {
+
+            Log.d("File recording", "Successfully created new folder.");
+            File tempFile = new File(folder.getAbsolutePath() +
+                    File.separator + name);
+
+            if(erase)
+                if (tempFile.exists())
+                    tempFile.delete();
+
+            Log.d("File recording", "Created new file : " + tempFile.getAbsolutePath());
+
+            return (folder.getAbsolutePath() + "/" + name);
 
         } else {
             Log.d("File recording", "Failed to create new folder");
@@ -99,7 +130,7 @@ public class WAVRecorder {
     private void writeAudioDataToFile() {
 
         byte data[] = new byte[bufferSize];
-        String filename = getTempFilename();
+        String filename = getTempFilename(true);
         FileOutputStream outputStream = null;
 
         try {
@@ -147,12 +178,15 @@ public class WAVRecorder {
             recordingThread = null;
         }
 
-        //copyWaveFile(getTempFilename(), getFilename());
-        //deleteTempFile();
+    }
+
+    public void saveTo(String filename) {
+        copyWaveFile(getTempFilename(false), filename);
+        deleteTempFile();
     }
 
     private void deleteTempFile() {
-        File file = new File(getTempFilename());
+        File file = new File(getTempFilename(true));
         file.delete();
     }
 
@@ -171,7 +205,8 @@ public class WAVRecorder {
         try {
 
             in = new FileInputStream(inFilename);
-            out = new FileOutputStream(outFilename);
+            Log.d("SAVING", "LOL");
+            out = new FileOutputStream(getFileName(outFilename, true));
             totalAudioLen = in.getChannel().size();
             totalDataLen = totalAudioLen + 36;
 

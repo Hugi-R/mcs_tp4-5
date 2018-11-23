@@ -3,9 +3,11 @@ package com.example.aliceprobst.mcs;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
@@ -16,11 +18,11 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
     private ArrayList<Recording> recordingArrayList;
     private Context context;
 
-    private static RecyclerViewClickListener itemListener;
+    private static RecordingsRecyclerViewListener itemListener;
 
     private int selectedItem = RecyclerView.NO_POSITION;
 
-    public RecordingAdapter(Context context, RecyclerViewClickListener itemListener, ArrayList<Recording> recordingArrayList){
+    public RecordingAdapter(Context context, RecordingsRecyclerViewListener itemListener, ArrayList<Recording> recordingArrayList){
         this.context = context;
         this.itemListener = itemListener;
         this.recordingArrayList = recordingArrayList;
@@ -52,6 +54,7 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
 
     public class RecordingViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        Button delete;
         TextView command_name;
         CheckBox asRef, asTest;
 
@@ -59,9 +62,36 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
             super(itemView);
             itemView.setOnClickListener(this);
 
+            delete = itemView.findViewById(R.id.delete_recording);
             command_name = itemView.findViewById(R.id.command_name);
             asRef = itemView.findViewById(R.id.asRef);
             asTest = itemView.findViewById(R.id.asTest);
+
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    itemListener.deleteRecording(recordingArrayList.get(getAdapterPosition()));
+                }
+            });
+
+            asRef.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (((CheckBox) v).isChecked()) {
+                        itemListener.addAsRef(recordingArrayList.get(getAdapterPosition()));
+                    }
+
+                }
+            });
+
+            asTest.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (((CheckBox) v).isChecked()) {
+                        itemListener.addAsRef(recordingArrayList.get(getAdapterPosition()));
+                    }
+                }
+            });
 
         }
 
@@ -70,6 +100,8 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
             // Below line is just like a safety check, because sometimes holder could be null,
             // in that case, getAdapterPosition() will return RecyclerView.NO_POSITION
             if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
+
+            Log.d("CLICKED", v.toString());
 
             // Updating old as well as new positions
             notifyItemChanged(selectedItem);
