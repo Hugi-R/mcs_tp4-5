@@ -3,7 +3,7 @@
     package="com.example.aliceprobst.mcs">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -34,7 +34,8 @@
         <activity
             android:name=".RecordingsActivity"
             android:label="@string/title_activity_recordings"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".DetailActivity"></activity>
     </application>
 
 </manifest>

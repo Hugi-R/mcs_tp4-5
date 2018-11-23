@@ -6,4 +6,90 @@
     android:layout_height="match_parent"
     tools:context=".ResultsActivity">
 
+    <LinearLayout
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="90dp">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/winnerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="253dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/labelWinner"
+                android:layout_width="184dp"
+                android:layout_height="79dp"
+                android:layout_marginTop="4dp"
+                android:text="TextView"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_editor_absoluteX="104dp" />
+
+            <TextView
+                android:id="@+id/tauxWinner"
+                android:layout_width="188dp"
+                android:layout_height="86dp"
+                android:text="TextView"
+                tools:layout_editor_absoluteX="40dp"
+                tools:layout_editor_absoluteY="111dp" />
+
+            <Button
+                android:id="@+id/buttonWinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:onClick="showWinnerDetail"
+                android:text="Détails"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:layout_editor_absoluteY="121dp" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/looserLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tauxLooser"
+                android:layout_width="200dp"
+                android:layout_height="90dp"
+                android:text="TextView"
+                tools:layout_editor_absoluteX="44dp"
+                tools:layout_editor_absoluteY="108dp" />
+
+            <Button
+                android:id="@+id/buttonLooser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:onClick="showLooserDetail"
+                android:text="Détails"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:layout_editor_absoluteY="126dp" />
+
+            <TextView
+                android:id="@+id/labelLooser"
+                android:layout_width="157dp"
+                android:layout_height="59dp"
+                android:text="TextView"
+                tools:layout_editor_absoluteX="114dp"
+                tools:layout_editor_absoluteY="7dp" />
+
+        </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>
